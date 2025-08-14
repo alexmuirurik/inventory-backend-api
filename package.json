@@ -23,7 +23,10 @@
     "@nestjs/common": "^11.0.1",
     "@nestjs/core": "^11.0.1",
     "@nestjs/platform-express": "^11.0.1",
+    "@nestjs/swagger": "^11.2.0",
     "@prisma/client": "^6.13.0",
+    "cookie-parser": "^1.4.7",
+    "helmet": "^8.1.0",
     "prisma": "^6.13.0",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1"

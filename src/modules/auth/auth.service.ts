@@ -55,10 +55,7 @@ export class AuthService {
         return newRefreshToken
     }
 
-    async generateTokenPair(
-        user: User,
-        res: any,
-    ): Promise<{ accessToken: string }> {
+    async generateTokenPair(user: User): Promise<{ accessToken: string }> {
         const payload = {
             email: user.email,
             sub: user.id,
@@ -66,17 +63,13 @@ export class AuthService {
 
         const refreshToken = await this.generateRefreshToken(user.id)
 
-        res.cookie(REFRESH_TOKEN_COOKIE, refreshToken, {
-            ...COOKIE_OPTIONS,
-        })
-
         return {
             accessToken: this.jwtService.sign(payload),
         }
     }
 
-    async login(user: User, res: Response): Promise<any> {
-        const result = await this.generateTokenPair(user, res)
+    async login(user: User): Promise<any> {
+        const result = await this.generateTokenPair(user)
         this.logger.log(this.SERVICE, {
             event: 'Login',
             userId: user.id,

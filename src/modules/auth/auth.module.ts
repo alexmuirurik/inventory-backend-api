@@ -7,13 +7,13 @@ import { JWT_ACCESS_TOKEN_EXPIRY_TIME } from './auth.constants'
 import { JwtStrategy } from './strategies/jwt-strategy'
 import { PassportModule } from '@nestjs/passport'
 import { UsersModule } from '../users/users.module'
-import { SequelizeModule } from '@nestjs/sequelize'
 import { JwtRefreshStrategy } from './strategies/jwt-refresh.strategy'
 import { APP_GUARD } from '@nestjs/core'
 import { JwtAuthGuard } from './guards/jwt-auth.guard'
 
 @Module({
 	imports: [
+        ConfigModule,
 		UsersModule,
 		PassportModule,
 		JwtModule.registerAsync({
@@ -43,5 +43,6 @@ import { JwtAuthGuard } from './guards/jwt-auth.guard'
         }
 
     ],
+    exports: [AuthService]
 })
 export class AuthModule {}

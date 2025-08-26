@@ -15,12 +15,6 @@ async function bootstrap() {
 
     app.setGlobalPrefix('api')
 
-    app.useGlobalPipes(
-        new ValidationPipe({
-            transform: true,
-        }),
-    )
-
     const config = new DocumentBuilder()
         .setTitle('Huntsman Backend API')
         .setDescription(
@@ -39,14 +33,14 @@ async function bootstrap() {
     SwaggerModule.setup('docs', app, document)
 
     app.use(helmet())
-    app.use(cookieParser())
+    app.use(cookieParser.default())
 
     app.enableCors({
         credentials: true,
         origin: '*',
         methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
         preflightContinue: false,
-        optionsSuccessStatus: 204,
+        optionsSuccessStatus: 200,
     })
 
     await app.listen(process.env.PORT ?? 3001)

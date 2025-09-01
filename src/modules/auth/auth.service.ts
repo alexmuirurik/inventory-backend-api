@@ -32,14 +32,7 @@ export class AuthService {
     }
 
     async validateUserWithId(userId: string) {
-        const users = [
-            {
-                email: 'content@alexmuiruri.com',
-                name: 'Alex Muiruri',
-                userId: 'alexmuirurik',
-            },
-        ]
-        const user = users.find((user) => user.userId === userId)
+        const user = await this.usersService.findUserById(userId)
         return user ?? null
     }
 
@@ -55,7 +48,10 @@ export class AuthService {
         return newRefreshToken
     }
 
-    async generateTokenPair(user: User): Promise<{ accessToken: string }> {
+    async generateTokenPair(
+        user: User,
+        res: any
+    ): Promise<{ accessToken: string }> {
         const payload = {
             email: user.email,
             sub: user.id,
@@ -63,13 +59,18 @@ export class AuthService {
 
         const refreshToken = await this.generateRefreshToken(user.id)
 
+        res.cookie(REFRESH_TOKEN_COOKIE, refreshToken, {
+            ...COOKIE_OPTIONS,
+        })
+
         return {
             accessToken: this.jwtService.sign(payload),
         }
     }
 
-    async login(user: User): Promise<any> {
-        const result = await this.generateTokenPair(user)
+    async login(user: User, res: Response): Promise<any> {
+        console.log(user)
+        const result = await this.generateTokenPair(user, res)
         this.logger.log(this.SERVICE, {
             event: 'Login',
             userId: user.id,

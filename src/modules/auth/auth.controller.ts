@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, UsePipes } from '@nestjs/common'
+import { Body, Controller, Get, Post, Res, UsePipes } from '@nestjs/common'
 import { AuthService } from './auth.service'
 import { Public } from 'src/common/helpers'
 import { ZodValidationPipe } from 'src/common/validators/zodValidator'
@@ -10,8 +10,8 @@ export class AuthController {
 
     @Public()
     @UsePipes(new ZodValidationPipe(LoginSchema))
-    @Get('login')
-    async login(@Body() body: any) {
-        return this.service.login(body)
+    @Post('signin')
+    async login(@Res() res: Response,  @Body() body: any) {
+        return this.service.login(body, res)
     }
 }

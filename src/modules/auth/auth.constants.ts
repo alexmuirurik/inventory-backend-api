@@ -1,69 +1,54 @@
-export const JWT_ACCESS_TOKEN_EXPIRY_TIME = '1h';
-export const JWT_REFRESH_TOKEN_EXPIRY_TIME = '30days';
+export const JWT_ACCESS_TOKEN_EXPIRY_TIME = '1h'
+export const JWT_REFRESH_TOKEN_EXPIRY_TIME = '30days'
 
-export const SWAGGER_API_TAG = 'auth';
+export const SWAGGER_API_TAG = 'auth'
 
 export const SWAGGER_SUMMARIES = {
-  LOGIN: 'Login User',
-  REFRESH_TOKEN: 'Refresh Access Token',
-  REFRESH_MAP_TOKEN: 'Refresh Map Access Token',
-};
+    LOGIN: 'Login User',
+    REFRESH_TOKEN: 'Refresh Access Token',
+    REFRESH_MAP_TOKEN: 'Refresh Map Access Token',
+}
 
 export const SWAGGER_DESCRIPTIONS = {
-  LOGIN: {
-    SUCCESS: 'User logged in succesfully',
-  },
-  REFRESH_TOKEN: {
-    SUCCESS: 'New Access token generated',
-  },
-  REFRESH_MAP_TOKEN: {
-    SUCCESS: 'New OS Maps token generated',
-  },
-};
-
-export const SWAGGER_EXAMPLES = {
-  LOGIN_DTO: {
-    email: 'john.doe@example.com',
-    password: 'password123',
-  },
-  LOGIN_SUCCESS_DTO: {
-    accessToken:
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImpvaG4uZG9lQGV4YW1wbGUuY29tIiwic3ViIjoiNTdiYTRhNTItYjU5MC00ZTc',
-    mapAccessToken: 'mXVqdcfq3xJxFrRccYKVXCLW0CbgK',
-  },
-  REFRESH_MAP_TOKEN_DTO: {
-    mapAccessToken: 'mXVqdcfq3xJxFrRccYKVXCLW0CbgK',
-  },
-};
+    LOGIN: {
+        SUCCESS: 'User logged in succesfully',
+    },
+    REFRESH_TOKEN: {
+        SUCCESS: 'New Access token generated',
+    },
+    REFRESH_MAP_TOKEN: {
+        SUCCESS: 'New OS Maps token generated',
+    },
+}
 
 export const EXCEPTIONS = {
-  unAuthorized: {
-    description: 'Unauthorized',
-    example: {
-      statusCode: 401,
-      message: 'Unauthorized',
+    unAuthorized: {
+        description: 'Unauthorized',
+        example: {
+            statusCode: 401,
+            message: 'Unauthorized',
+        },
     },
-  },
-  invalidLoginCredentials: {
-    description: 'Invalid Login Credentials',
-    example: {
-      statusCode: 401,
-      message: 'Invalid Login Credentials',
+    invalidLoginCredentials: {
+        description: 'Invalid Login Credentials',
+        example: {
+            statusCode: 401,
+            message: 'Invalid Login Credentials',
+        },
     },
-  },
-  invalidRefreshToken: {
-    description: 'Invalid Refresh Token',
-    example: {
-      statusCode: 401,
-      message: 'Invalid Refresh Token',
+    invalidRefreshToken: {
+        description: 'Invalid Refresh Token',
+        example: {
+            statusCode: 401,
+            message: 'Invalid Refresh Token',
+        },
     },
-  },
-  userDoesNotExist: {
-    description: 'User with the given email does not exist.',
-    example: {
-      statusCode: 404,
-      message:
-        'User with the given email does not exist. Please create an account first.',
+    userDoesNotExist: {
+        description: 'User with the given email does not exist.',
+        example: {
+            statusCode: 404,
+            message:
+                'User with the given email does not exist. Please create an account first.',
+        },
     },
-  },
-};
+}

@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Res, UsePipes } from '@nestjs/common'
+import { Body, Controller, Post, Req, Res, UsePipes } from '@nestjs/common'
 import { AuthService } from './auth.service'
 import { Public } from 'src/common/helpers'
 import { ZodValidationPipe } from 'src/common/validators/zodValidator'
@@ -15,22 +15,21 @@ export class AuthController {
     @Post('signin')
     @UsePipes(new ZodValidationPipe(LoginSchema))
     async login(
-        @Body() body: z.infer<typeof LoginSchema>,
+        @Req() req: express.Request,
         @Res({ passthrough: true }) response: express.Response,
     ) {
-        const user = await this.service.login(body)
+        console.log(req.user)
+        const user = await this.service.login(req.body)
         const { refreshToken } = user
         response.cookie(REFRESH_TOKEN_COOKIE, refreshToken, { httpOnly: true })
         return user
     }
 
-    @Public()
+
     @Post('refreshToken')
-    async refresh() {
-        console.log('here')
-        return {
-            accessToken: 'klkl',
-        }
+    async refresh(@Req() req: express.Request) {
+        const { user } = req
+        return { user }
     }
 
     @Post('logout')

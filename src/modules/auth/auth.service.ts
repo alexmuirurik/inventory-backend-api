@@ -60,8 +60,8 @@ export class AuthService {
                 refreshToken: this.jwtService.sign(
                     { sub: user.id },
                     {
-                        secret: this.configService.get(
-                            'JWT_REFRESH_TOKEN_SECRET',
+                        secret: this.configService.getOrThrow(
+                            'JWT_ACCESS_TOKEN_SECRET',
                         ),
                         expiresIn: JWT_REFRESH_TOKEN_EXPIRY_TIME,
                     },
@@ -109,7 +109,7 @@ export class AuthService {
     async refreshToken(refreshToken: string) {
         try {
             const payload = this.jwtService.verify(refreshToken, {
-                secret: this.configService.get('JWT_REFRESH_TOKEN_SECRET'),
+                secret: this.configService.get('JWT_ACCESS_TOKEN_SECRET'),
             })
 
             const user = await this.validateUserWithId(payload.sub)
@@ -123,7 +123,7 @@ export class AuthService {
     async logout(refreshToken: string) {
         try {
             const payload = this.jwtService.verify(refreshToken, {
-                secret: this.configService.get('JWT_REFRESH_TOKEN_SECRET'),
+                secret: this.configService.get('JWT_ACCESS_TOKEN_SECRET'),
             })
 
             const user = await this.validateUserWithId(payload.sub)

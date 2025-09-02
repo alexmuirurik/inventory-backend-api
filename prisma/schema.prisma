@@ -14,6 +14,31 @@ datasource db {
     url      = env("DATABASE_URL")
 }
 
+enum PaymentMethod {
+    CASH
+    CARD
+    MOBILE_MONEY
+    BANK_TRANSFER
+}
+
+enum PaymentStatus {
+    PAID
+    PENDING
+    REFUNDED
+}
+
+enum UserRole {
+    ADMIN
+    MANAGER
+    CASHIER
+}
+
+enum PurchaseOrderStatus {
+    PENDING
+    RECEIVED
+    CANCELLED
+}
+
 model User {
     id           String   @id @default(auto()) @map("_id") @db.ObjectId
     firstName    String
@@ -21,18 +46,138 @@ model User {
     refreshToken String?
     email        String   @unique
     password     String
-    posts        Post[]
+    role         UserRole @default(CASHIER)
+    sales        Sale[]
     createdAt    DateTime @default(now())
     updatedAt    DateTime @updatedAt
 }
 
-model Post {
-    id        String   @id @default(cuid()) @map("_id") @db.ObjectId
-    title     String
-    content   String?
-    published Boolean? @default(false)
-    author    User?    @relation(fields: [authorId], references: [id])
-    authorId  String?  @db.ObjectId
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+model Product {
+    id            String              @id @default(auto()) @map("_id") @db.ObjectId
+    name          String
+    sku           String              @unique
+    barcode       String?             @unique
+    categoryId    String              @db.ObjectId
+    category      ProductCategory     @relation(fields: [categoryId], references: [id])
+    unit          String
+    costPrice     Float
+    sellingPrice  Float
+    reorderLevel  Int                 @default(0)
+    isActive      Boolean             @default(true)
+    stock         Stock[]
+    saleItems     SaleItem[]
+    purchaseItems PurchaseOrderItem[]
+    returns       Return[]
+    createdAt     DateTime            @default(now())
+    updatedAt     DateTime            @updatedAt
+}
+
+model ProductCategory {
+    id          String    @id @default(auto()) @map("_id") @db.ObjectId
+    name        String
+    description String?
+    products    Product[]
+}
+
+model Stock {
+    id         String        @id @default(auto()) @map("_id") @db.ObjectId
+    productId  String        @db.ObjectId
+    product    Product       @relation(fields: [productId], references: [id])
+    locationId String        @db.ObjectId
+    location   StoreLocation @relation(fields: [locationId], references: [id])
+    quantity   Int           @default(0)
+    updatedAt  DateTime      @updatedAt
+}
+
+model Supplier {
+    id             String          @id @default(auto()) @map("_id") @db.ObjectId
+    name           String
+    contactInfo    String?
+    address        String?
+    taxId          String?
+    purchaseOrders PurchaseOrder[]
+}
+
+model PurchaseOrder {
+    id         String              @id @default(auto()) @map("_id") @db.ObjectId
+    supplierId String              @db.ObjectId
+    supplier   Supplier            @relation(fields: [supplierId], references: [id])
+    orderDate  DateTime            @default(now())
+    status     PurchaseOrderStatus @default(PENDING)
+    totalCost  Float
+    items      PurchaseOrderItem[]
+}
+
+model PurchaseOrderItem {
+    id         String        @id @default(auto()) @map("_id") @db.ObjectId
+    purchaseId String        @db.ObjectId
+    purchase   PurchaseOrder @relation(fields: [purchaseId], references: [id])
+    productId  String        @db.ObjectId
+    product    Product       @relation(fields: [productId], references: [id])
+    quantity   Int
+    costPrice  Float
+}
+
+model Sale {
+    id            String        @id @default(auto()) @map("_id") @db.ObjectId
+    customerId    String?       @db.ObjectId
+    customer      Customer?     @relation(fields: [customerId], references: [id])
+    userId        String        @db.ObjectId
+    user          User          @relation(fields: [userId], references: [id])
+    saleDate      DateTime      @default(now())
+    totalAmount   Float
+    paymentStatus PaymentStatus @default(PAID)
+    paymentMethod PaymentMethod
+    saleItems     SaleItem[]
+    payments      Payment[]
+    returns       Return[]
+}
+
+model SaleItem {
+    id        String  @id @default(auto()) @map("_id") @db.ObjectId
+    saleId    String  @db.ObjectId
+    sale      Sale    @relation(fields: [saleId], references: [id])
+    productId String  @db.ObjectId
+    product   Product @relation(fields: [productId], references: [id])
+    quantity  Int
+    unitPrice Float
+    discount  Float   @default(0)
+    subtotal  Float
+}
+
+model Payment {
+    id          String        @id @default(auto()) @map("_id") @db.ObjectId
+    saleId      String        @db.ObjectId
+    sale        Sale          @relation(fields: [saleId], references: [id])
+    amount      Float
+    method      PaymentMethod
+    reference   String?
+    paymentDate DateTime      @default(now())
+}
+
+model Return {
+    id         String   @id @default(auto()) @map("_id") @db.ObjectId
+    saleId     String   @db.ObjectId
+    sale       Sale     @relation(fields: [saleId], references: [id])
+    productId  String   @db.ObjectId
+    product    Product  @relation(fields: [productId], references: [id])
+    quantity   Int
+    reason     String?
+    returnDate DateTime @default(now())
+}
+
+model Customer {
+    id            String  @id @default(auto()) @map("_id") @db.ObjectId
+    name          String
+    phone         String? @unique
+    email         String? @unique
+    loyaltyPoints Int     @default(0)
+    sales         Sale[]
+}
+
+model StoreLocation {
+    id      String  @id @default(auto()) @map("_id") @db.ObjectId
+    name    String
+    address String?
+    stocks  Stock[]
 }

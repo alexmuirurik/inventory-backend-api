@@ -53,23 +53,23 @@ model User {
 }
 
 model Product {
-    id            String              @id @default(auto()) @map("_id") @db.ObjectId
+    id            String               @id @default(auto()) @map("_id") @db.ObjectId
     name          String
-    sku           String              @unique
-    barcode       String?             @unique
-    categoryId    String              @db.ObjectId
-    category      ProductCategory     @relation(fields: [categoryId], references: [id])
+    sku           String               @unique
+    barcode       String?              @unique
+    categoryId    String               @db.ObjectId
+    category      ProductCategory      @relation(fields: [categoryId], references: [id])
     unit          String
     costPrice     Float
     sellingPrice  Float
-    reorderLevel  Int                 @default(0)
-    isActive      Boolean             @default(true)
+    reorderLevel  Int                  @default(0)
+    isActive      Boolean              @default(true)
     stock         Stock[]
     saleItems     SaleItem[]
-    purchaseItems PurchaseOrderItem[]
+    purchaseItems ProductCheckinItem[]
     returns       Return[]
-    createdAt     DateTime            @default(now())
-    updatedAt     DateTime            @updatedAt
+    createdAt     DateTime             @default(now())
+    updatedAt     DateTime             @updatedAt
 }
 
 model ProductCategory {
@@ -89,31 +89,22 @@ model Stock {
     updatedAt  DateTime      @updatedAt
 }
 
-model Supplier {
-    id             String          @id @default(auto()) @map("_id") @db.ObjectId
-    name           String
-    contactInfo    String?
-    address        String?
-    taxId          String?
-    purchaseOrders PurchaseOrder[]
-}
-
-model PurchaseOrder {
-    id         String              @id @default(auto()) @map("_id") @db.ObjectId
-    supplierId String              @db.ObjectId
-    supplier   Supplier            @relation(fields: [supplierId], references: [id])
-    orderDate  DateTime            @default(now())
-    status     PurchaseOrderStatus @default(PENDING)
+model ProductCheckIn {
+    id         String               @id @default(auto()) @map("_id") @db.ObjectId
+    supplierId String               @db.ObjectId
+    supplier   Supplier             @relation(fields: [supplierId], references: [id])
+    orderDate  DateTime             @default(now())
+    status     PurchaseOrderStatus  @default(PENDING)
     totalCost  Float
-    items      PurchaseOrderItem[]
+    items      ProductCheckinItem[]
 }
 
-model PurchaseOrderItem {
-    id         String        @id @default(auto()) @map("_id") @db.ObjectId
-    purchaseId String        @db.ObjectId
-    purchase   PurchaseOrder @relation(fields: [purchaseId], references: [id])
-    productId  String        @db.ObjectId
-    product    Product       @relation(fields: [productId], references: [id])
+model ProductCheckinItem {
+    id         String         @id @default(auto()) @map("_id") @db.ObjectId
+    purchaseId String         @db.ObjectId
+    purchase   ProductCheckIn @relation(fields: [purchaseId], references: [id])
+    productId  String         @db.ObjectId
+    product    Product        @relation(fields: [productId], references: [id])
     quantity   Int
     costPrice  Float
 }
@@ -166,12 +157,21 @@ model Return {
     returnDate DateTime @default(now())
 }
 
+model Supplier {
+    id              String           @id @default(auto()) @map("_id") @db.ObjectId
+    name            String
+    contactInfo     String?
+    address         String?
+    taxId           String?
+    productCheckIns ProductCheckIn[]
+}
+
 model Customer {
-    id            String  @id @default(auto()) @map("_id") @db.ObjectId
+    id            String     @id @default(auto()) @map("_id") @db.ObjectId
     name          String
-    phone         String? @unique
-    email         String? @unique
-    loyaltyPoints Int     @default(0)
+    phone         String?    @unique
+    email         String?    @unique
+    loyaltyPoints Int        @default(0)
     sales         Sale[]
 }
 

@@ -1,4 +1,12 @@
-import { Body, Controller, Post, Req, Res, UsePipes } from '@nestjs/common'
+import {
+    Body,
+    Controller,
+    Post,
+    Req,
+    Res,
+    UnauthorizedException,
+    UsePipes,
+} from '@nestjs/common'
 import { AuthService } from './auth.service'
 import { Public } from 'src/common/helpers'
 import { ZodValidationPipe } from 'src/common/validators/zodValidator'
@@ -25,16 +33,28 @@ export class AuthController {
         return user
     }
 
-
     @Post('refreshToken')
     async refresh(@Req() req: express.Request) {
-        const { user } = req
-        return { user }
+        const { refreshToken } = req.cookies
+        if (!refreshToken) {
+            throw new UnauthorizedException('Refresh token not found')
+        }
+
+        return this.service.refreshToken(refreshToken)
     }
 
     @Post('logout')
-    async logout(@Body('refreshToken') refreshToken: string) {
-        return await this.service.logout(refreshToken)
+    async logout(
+        @Req() req: express.Request,
+        @Res({ passthrough: true }) response: express.Response,
+    ) {
+        const { refreshToken } = req.cookies
+        const loggedOut = await this.service.logout(refreshToken)
+        if (loggedOut) {
+            response.clearCookie(REFRESH_TOKEN_COOKIE)
+        }
+
+        return { loggedOut }
     }
 
     @Public()

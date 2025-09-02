@@ -18,6 +18,17 @@ export class UsersService {
         }
     }
 
+    async findAll(criteria?: Partial<User>) {
+        try {
+            const users = await this.prisma.user.findMany({
+                where: criteria,
+            })
+            return Promise.resolve(users)
+        } catch (error) {
+            return Promise.reject(error)
+        }
+    }
+
     async findUserById(userId: string) {
         try {
             const user = await this.prisma.user.findFirst({
@@ -59,6 +70,24 @@ export class UsersService {
             })
 
             return Promise.resolve(user)
+        } catch (error) {
+            return Promise.reject(error)
+        }
+    }
+
+    async deleteUserById(userId: string) {
+        try {
+            const deleted = await this.prisma.user.delete({
+                where: {
+                    id: userId,
+                },
+            })
+            
+            if (!deleted) {
+                return Promise.resolve({ message: 'User not found' })
+            }
+
+            return Promise.resolve({ message: 'User deleted successfully' })
         } catch (error) {
             return Promise.reject(error)
         }

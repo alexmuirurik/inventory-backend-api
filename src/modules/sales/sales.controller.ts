@@ -1,34 +1,52 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
-import { SalesService } from './sales.service';
-import { CreateSaleDto } from './dto/create-sale.dto';
-import { UpdateSaleDto } from './dto/update-sale.dto';
+import {
+    Controller,
+    Get,
+    Post,
+    Body,
+    Patch,
+    Param,
+    Delete,
+	UsePipes,
+} from '@nestjs/common'
+import { SalesService } from './sales.service'
+import z from 'zod'
+import { SaleItemSchema } from 'src/common/schemas/sales.schema'
+import { ZodValidationPipe } from 'src/common/validators/zodValidator'
+import { IdSchema } from 'src/common/schemas/product.schemas'
 
 @Controller('sales')
 export class SalesController {
-  constructor(private readonly salesService: SalesService) {}
+    constructor(private readonly salesService: SalesService) {}
 
-  @Post()
-  create(@Body() createSaleDto: CreateSaleDto) {
-    return this.salesService.create(createSaleDto);
-  }
+	 @Get()
+    findAll() {
+        return this.salesService.findAll()
+    }
 
-  @Get()
-  findAll() {
-    return this.salesService.findAll();
-  }
+    @Post()
+	@UsePipes(new ZodValidationPipe(SaleItemSchema))
+    create(@Body() createSaleDto: z.infer<typeof SaleItemSchema>) {
+        return this.salesService.create(createSaleDto)
+    }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.salesService.findOne(+id);
-  }
+    @Get(':id')
+	@UsePipes(new ZodValidationPipe(IdSchema))
+    findOne(@Param('id') id: string) {
+        return this.salesService.findOne(id)
+    }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateSaleDto: UpdateSaleDto) {
-    return this.salesService.update(+id, updateSaleDto);
-  }
+    @Patch(':id')
+	@UsePipes(new ZodValidationPipe(SaleItemSchema))
+    update(
+        @Param('id') id: string,
+        @Body() updateSaleDto: z.infer<typeof SaleItemSchema>,
+    ) {
+        return this.salesService.update(id, updateSaleDto)
+    }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.salesService.remove(+id);
-  }
+    @Delete(':id')
+	@UsePipes(new ZodValidationPipe(IdSchema))
+    remove(@Param('id') id: string) {
+        return this.salesService.remove(id)
+    }
 }

@@ -1,26 +1,63 @@
-import { Injectable } from '@nestjs/common';
-import { CreateSaleDto } from './dto/create-sale.dto';
-import { UpdateSaleDto } from './dto/update-sale.dto';
+import { Injectable } from '@nestjs/common'
+import { SaleItemSchema } from 'src/common/schemas/sales.schema'
+import z from 'zod'
+import { PrismaService } from '../prisma/prisma.service'
 
 @Injectable()
 export class SalesService {
-  create(createSaleDto: CreateSaleDto) {
-    return 'This action adds a new sale';
-  }
+    constructor(private readonly prisma: PrismaService) {}
 
-  findAll() {
-    return `This action returns all sales`;
-  }
+    async create(createSaleDto: z.infer<typeof SaleItemSchema>) {
+        try {
+            const sale = await this.prisma.sale.create({
+                data: createSaleDto,
+            })
+            return sale
+        } catch (error) {
+            return Promise.reject(error)
+        }
+    }
 
-  findOne(id: number) {
-    return `This action returns a #${id} sale`;
-  }
+    async findAll() {
+        try {
+            const sales = await this.prisma.sale.findMany()
+            return sales
+        } catch (error) {
+            return Promise.reject(error)
+        }
+    }
 
-  update(id: number, updateSaleDto: UpdateSaleDto) {
-    return `This action updates a #${id} sale`;
-  }
+    async findOne(id: string) {
+        try {
+            const sale = await this.prisma.sale.findUnique({
+                where: { id },
+            })
+            return sale
+        } catch (error) {
+            return Promise.reject(error)
+        }
+    }
 
-  remove(id: number) {
-    return `This action removes a #${id} sale`;
-  }
+    async update(id: string, updateSaleDto: z.infer<typeof SaleItemSchema>) {
+        try {
+            const sale = await this.prisma.sale.update({
+                where: { id },
+                data: updateSaleDto,
+            })
+            return sale
+        } catch (error) {
+            return Promise.reject(error)
+        }
+    }
+
+    async remove(id: string) {
+        try {
+            const sale = await this.prisma.sale.delete({
+                where: { id },
+            })
+            return sale
+        } catch (error) {
+            return Promise.reject(error)
+        }
+    }
 }

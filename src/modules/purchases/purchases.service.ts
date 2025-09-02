@@ -1,26 +1,65 @@
-import { Injectable } from '@nestjs/common';
-import { CreatePurchaseDto } from './dto/create-purchase.dto';
-import { UpdatePurchaseDto } from './dto/update-purchase.dto';
+import { Injectable } from '@nestjs/common'
+import { ProductCheckinItemSchema } from 'src/common/schemas/stock.schema'
+import z from 'zod'
+import { PrismaService } from '../prisma/prisma.service'
 
 @Injectable()
 export class PurchasesService {
-  create(createPurchaseDto: CreatePurchaseDto) {
-    return 'This action adds a new purchase';
-  }
+    constructor(private readonly prisma: PrismaService) {}
+    async create(createPurchase: z.infer<typeof ProductCheckinItemSchema>) {
+        try {
+            const purchase = await this.prisma.productCheckIn.create({
+                data: createPurchase,
+            })
+            return purchase
+        } catch (error) {
+            throw new Error('Error creating purchase')
+        }
+    }
 
-  findAll() {
-    return `This action returns all purchases`;
-  }
+    async findAll() {
+        try {
+            const purchases = await this.prisma.productCheckIn.findMany()
+            return purchases
+        } catch (error) {
+            throw new Error('Error fetching all purchases')
+        }
+    }
 
-  findOne(id: number) {
-    return `This action returns a #${id} purchase`;
-  }
+    async findOne(id: string) {
+        try {
+            const purchase = await this.prisma.productCheckIn.findUnique({
+                where: { id },
+            })
+            return purchase
+        } catch (error) {
+            throw new Error('Error fetching purchase')
+        }
+    }
 
-  update(id: number, updatePurchaseDto: UpdatePurchaseDto) {
-    return `This action updates a #${id} purchase`;
-  }
+    async update(
+        id: string,
+        updatePurchase: z.infer<typeof ProductCheckinItemSchema>,
+    ) {
+        try {
+            const purchase = await this.prisma.productCheckIn.update({
+                where: { id },
+                data: updatePurchase,
+            })
+            return purchase
+        } catch (error) {
+            throw new Error('Error updating purchase')
+        }
+    }
 
-  remove(id: number) {
-    return `This action removes a #${id} purchase`;
-  }
+    async remove(id: string) {
+        try {
+            await this.prisma.productCheckIn.delete({
+                where: { id },
+            })
+            return { message: 'Purchase removed successfully' }
+        } catch (error) {
+            throw new Error('Error removing purchase')
+        }
+    }
 }

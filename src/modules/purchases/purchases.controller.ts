@@ -1,34 +1,54 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
-import { PurchasesService } from './purchases.service';
-import { CreatePurchaseDto } from './dto/create-purchase.dto';
-import { UpdatePurchaseDto } from './dto/update-purchase.dto';
+import {
+    Controller,
+    Get,
+    Post,
+    Body,
+    Patch,
+    Param,
+    Delete,
+    UsePipes,
+} from '@nestjs/common'
+import { PurchasesService } from './purchases.service'
+import z from 'zod'
+import { ProductCheckinItemSchema } from 'src/common/schemas/stock.schema'
+import { ZodValidationPipe } from 'src/common/validators/zodValidator'
+import { IdSchema } from 'src/common/schemas/product.schemas'
 
 @Controller('purchases')
 export class PurchasesController {
-  constructor(private readonly purchasesService: PurchasesService) {}
+    constructor(private readonly purchasesService: PurchasesService) {}
 
-  @Post()
-  create(@Body() createPurchaseDto: CreatePurchaseDto) {
-    return this.purchasesService.create(createPurchaseDto);
-  }
+    @Get()
+    findAll() {
+        return this.purchasesService.findAll()
+    }
 
-  @Get()
-  findAll() {
-    return this.purchasesService.findAll();
-  }
+    @Post()
+    @UsePipes(new ZodValidationPipe(ProductCheckinItemSchema))
+    create(
+        @Body() createPurchaseDto: z.infer<typeof ProductCheckinItemSchema>,
+    ) {
+        return this.purchasesService.create(createPurchaseDto)
+    }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.purchasesService.findOne(+id);
-  }
+    @Get(':id')
+    @UsePipes(new ZodValidationPipe(IdSchema))
+    findOne(@Param('id') id: string) {
+        return this.purchasesService.findOne(id)
+    }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updatePurchaseDto: UpdatePurchaseDto) {
-    return this.purchasesService.update(+id, updatePurchaseDto);
-  }
+    @Patch(':id')
+    @UsePipes(new ZodValidationPipe(ProductCheckinItemSchema))
+    update(
+        @Param('id') id: string,
+        @Body() updatePurchaseDto: z.infer<typeof ProductCheckinItemSchema>,
+    ) {
+        return this.purchasesService.update(id, updatePurchaseDto)
+    }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.purchasesService.remove(+id);
-  }
+    @Delete(':id')
+    @UsePipes(new ZodValidationPipe(IdSchema))
+    remove(@Param('id') id: string) {
+        return this.purchasesService.remove(id)
+    }
 }

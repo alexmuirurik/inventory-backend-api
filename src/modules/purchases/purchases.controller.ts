@@ -10,7 +10,10 @@ import {
 } from '@nestjs/common'
 import { PurchasesService } from './purchases.service'
 import z from 'zod'
-import { ProductCheckinItemSchema } from 'src/common/schemas/stock.schema'
+import {
+    ProductCheckinItemSchema,
+    ProductCheckInSchema,
+} from 'src/common/schemas/stock.schema'
 import { ZodValidationPipe } from 'src/common/validators/zodValidator'
 import { IdSchema } from 'src/common/schemas/product.schemas'
 
@@ -25,9 +28,7 @@ export class PurchasesController {
 
     @Post()
     @UsePipes(new ZodValidationPipe(ProductCheckinItemSchema))
-    create(
-        @Body() createPurchaseDto: z.infer<typeof ProductCheckinItemSchema>,
-    ) {
+    create(@Body() createPurchaseDto: z.infer<typeof ProductCheckInSchema>) {
         return this.purchasesService.create(createPurchaseDto)
     }
 
@@ -41,7 +42,7 @@ export class PurchasesController {
     @UsePipes(new ZodValidationPipe(ProductCheckinItemSchema))
     update(
         @Param('id') id: string,
-        @Body() updatePurchaseDto: z.infer<typeof ProductCheckinItemSchema>,
+        @Body() updatePurchaseDto: z.infer<typeof ProductCheckInSchema>,
     ) {
         return this.purchasesService.update(id, updatePurchaseDto)
     }

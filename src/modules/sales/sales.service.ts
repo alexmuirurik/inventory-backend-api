@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common'
-import { SaleItemSchema } from 'src/common/schemas/sales.schema'
+import { SaleItemSchema, SaleSchema } from 'src/common/schemas/sales.schema'
 import z from 'zod'
 import { PrismaService } from '../prisma/prisma.service'
 
@@ -7,7 +7,7 @@ import { PrismaService } from '../prisma/prisma.service'
 export class SalesService {
     constructor(private readonly prisma: PrismaService) {}
 
-    async create(createSaleDto: z.infer<typeof SaleItemSchema>) {
+    async create(createSaleDto: z.infer<typeof SaleSchema>) {
         try {
             const sale = await this.prisma.sale.create({
                 data: createSaleDto,
@@ -38,7 +38,7 @@ export class SalesService {
         }
     }
 
-    async update(id: string, updateSaleDto: z.infer<typeof SaleItemSchema>) {
+    async update(id: string, updateSaleDto: z.infer<typeof SaleSchema>) {
         try {
             const sale = await this.prisma.sale.update({
                 where: { id },

@@ -79,15 +79,16 @@ model Supplier {
 }
 
 model CheckinSession {
-    id          String        @id @default(auto()) @map("_id") @db.ObjectId
-    supplierId  String?       @db.ObjectId
-    supplier    Supplier?     @relation(fields: [supplierId], references: [id])
-    locationId  String        @db.ObjectId
-    location    StoreLocation @relation(fields: [locationId], references: [id])
-    totalAmount Float
-    startedAt   DateTime      @default(now())
-    endedAt     DateTime?
-    status      SessionStatus @default(OPEN)
+    id             String           @id @default(auto()) @map("_id") @db.ObjectId
+    supplierId     String?          @db.ObjectId
+    supplier       Supplier?        @relation(fields: [supplierId], references: [id])
+    locationId     String           @db.ObjectId
+    location       StoreLocation    @relation(fields: [locationId], references: [id])
+    totalAmount    Float
+    status         SessionStatus    @default(OPEN)
+    ProductCheckIn ProductCheckIn[]
+    startedAt      DateTime         @default(now())
+    endedAt        DateTime?
 }
 
 model Customer {
@@ -105,12 +106,12 @@ model CheckoutSession {
     id          String        @id @default(auto()) @map("_id") @db.ObjectId
     cashierId   String        @db.ObjectId
     cashier     User          @relation(fields: [cashierId], references: [id])
-    startedAt   DateTime      @default(now())
-    endedAt     DateTime?
-    openingCash Float 
-    closingCash Float? 
+    openingCash Float
+    closingCash Float?
     sales       Sale[]
     status      SessionStatus @default(OPEN)
+    startedAt   DateTime      @default(now())
+    endedAt     DateTime?
 }
 
 model StoreLocation {
@@ -180,15 +181,17 @@ model Stock {
 }
 
 model ProductCheckIn {
-    id         String               @id @default(auto()) @map("_id") @db.ObjectId
-    supplierId String?              @db.ObjectId
-    supplier   Supplier?            @relation(fields: [supplierId], references: [id])
-    orderDate  DateTime             @default(now())
-    status     PurchaseOrderStatus  @default(PENDING)
-    totalCost  Float
-    items      ProductCheckinItem[]
-    createdAt  DateTime             @default(now())
-    updatedAt  DateTime             @updatedAt
+    id               String               @id @default(auto()) @map("_id") @db.ObjectId
+    checkinSessionId String?              @db.ObjectId
+    checkinSession   CheckinSession?      @relation(fields: [checkinSessionId], references: [id])
+    supplierId       String?              @db.ObjectId
+    supplier         Supplier?            @relation(fields: [supplierId], references: [id])
+    orderDate        DateTime             @default(now())
+    status           PurchaseOrderStatus  @default(PENDING)
+    totalCost        Float
+    items            ProductCheckinItem[]
+    createdAt        DateTime             @default(now())
+    updatedAt        DateTime             @updatedAt
 }
 
 model ProductCheckinItem {
@@ -205,11 +208,9 @@ model ProductCheckinItem {
 
 model Sale {
     id                String           @id @default(auto()) @map("_id") @db.ObjectId
+    checkoutSession   CheckoutSession? @relation(fields: [checkoutSessionId], references: [id])
+    checkoutSessionId String?          @db.ObjectId
     customerId        String?          @db.ObjectId
-    customer          Customer?        @relation(fields: [customerId], references: [id])
-    userId            String           @db.ObjectId
-    user              User             @relation(fields: [userId], references: [id])
-    saleDate          DateTime         @default(now())
     totalAmount       Float
     paymentStatus     PaymentStatus    @default(PAID)
     paymentMethod     PaymentMethod
@@ -219,8 +220,10 @@ model Sale {
     status            SaleStatus       @default(PENDING)
     createdAt         DateTime         @default(now())
     updatedAt         DateTime         @updatedAt
-    CheckoutSession   CheckoutSession? @relation(fields: [checkoutSessionId], references: [id])
-    checkoutSessionId String?          @db.ObjectId
+    saleDate          DateTime         @default(now())
+    User              User?            @relation(fields: [userId], references: [id])
+    userId            String?          @db.ObjectId
+    Customer          Customer?        @relation(fields: [customerId], references: [id])
 }
 
 model SaleItem {

@@ -11,7 +11,6 @@ import { ProductsModule } from './modules/products/products.module'
 import { CategoriesModule } from './modules/categories/categories.module'
 import { PurchasesModule } from './modules/purchases/purchases.module'
 import { SalesModule } from './modules/sales/sales.module'
-import { StocksModule } from './modules/stocks/stocks.module'
 
 @Module({
     imports: [
@@ -22,7 +21,6 @@ import { StocksModule } from './modules/stocks/stocks.module'
         CategoriesModule,
         PurchasesModule,
         SalesModule,
-        StocksModule,
     ],
     controllers: [AuthController, UsersController],
     providers: [UsersService, AuthService, PrismaService],

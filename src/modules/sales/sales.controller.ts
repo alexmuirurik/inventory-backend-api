@@ -10,7 +10,7 @@ import {
 } from '@nestjs/common'
 import { SalesService } from './sales.service'
 import z from 'zod'
-import { SaleItemSchema } from 'src/common/schemas/sales.schema'
+import { SaleItemSchema, SaleSchema } from 'src/common/schemas/sales.schema'
 import { ZodValidationPipe } from 'src/common/validators/zodValidator'
 import { IdSchema } from 'src/common/schemas/product.schemas'
 
@@ -24,8 +24,8 @@ export class SalesController {
     }
 
     @Post()
-	@UsePipes(new ZodValidationPipe(SaleItemSchema))
-    create(@Body() createSaleDto: z.infer<typeof SaleItemSchema>) {
+	@UsePipes(new ZodValidationPipe(SaleSchema))
+    create(@Body() createSaleDto: z.infer<typeof SaleSchema>) {
         return this.salesService.create(createSaleDto)
     }
 
@@ -36,10 +36,10 @@ export class SalesController {
     }
 
     @Patch(':id')
-	@UsePipes(new ZodValidationPipe(SaleItemSchema))
+	@UsePipes(new ZodValidationPipe(SaleSchema))
     update(
         @Param('id') id: string,
-        @Body() updateSaleDto: z.infer<typeof SaleItemSchema>,
+        @Body() updateSaleDto: z.infer<typeof SaleSchema>,
     ) {
         return this.salesService.update(id, updateSaleDto)
     }

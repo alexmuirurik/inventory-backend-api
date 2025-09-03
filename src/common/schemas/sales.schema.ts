@@ -1,8 +1,23 @@
-import z from "zod";
+import z from 'zod'
+
+export const SaleSchema = z.object({
+    checkoutSessionId: z.string(),
+    customerId: z.string(),
+    paymentStatus: z.enum(['PAID', 'PENDING', 'REFUNDED']),
+    paymentMethod: z.enum([
+        'CASH',
+        'CARD',
+        'MOBILE_MONEY',
+        'BANK_TRANSFER',
+        'SPLIT_PAYMENT',
+    ]),
+    status: z.enum(['PENDING', 'COMPLETED', 'CANCELLED']),
+    totalAmount: z.number().min(0),
+})
 
 export const SaleItemSchema = z.object({
     saleId: z.string(),
-    productId: z.string().uuid(),
+    productId: z.string(),
     quantity: z.number().min(1),
     unitPrice: z.number().min(0),
     discount: z.number().min(0).optional(),

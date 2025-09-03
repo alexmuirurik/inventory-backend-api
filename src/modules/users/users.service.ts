@@ -58,7 +58,7 @@ export class UsersService {
         }
     }
 
-    async update(data: UserWithoutPassword) {
+    async update(data: Partial<UserWithoutPassword>) {
         try {
             const { id, ...userData } = data
             const user = await this.prisma.user.update({

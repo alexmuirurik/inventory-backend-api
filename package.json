@@ -29,6 +29,7 @@
     "@nestjs/sequelize": "^11.0.0",
     "@nestjs/swagger": "^11.2.0",
     "@prisma/client": "^6.13.0",
+    "@types/bcrypt": "^6.0.0",
     "@types/cookie-parser": "^1.4.9",
     "@types/passport-jwt": "^4.0.1",
     "@types/passport-local": "^1.0.38",

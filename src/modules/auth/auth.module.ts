@@ -9,6 +9,8 @@ import { UsersModule } from '../users/users.module'
 import { APP_GUARD } from '@nestjs/core'
 import { JwtAuthGuard } from './guards/jwt-auth.guard'
 import { JwtStrategy } from './strategies/jwt-strategy'
+import { LocalStrategy } from './strategies/local-strategy'
+import { JwtRefreshStrategy } from './strategies/jwt-refresh-strategy'
 
 @Module({
     imports: [
@@ -35,6 +37,8 @@ import { JwtStrategy } from './strategies/jwt-strategy'
     providers: [
         AuthService,
         JwtStrategy,
+        LocalStrategy,
+        JwtRefreshStrategy,
         {
             provide: APP_GUARD,
             useClass: JwtAuthGuard,

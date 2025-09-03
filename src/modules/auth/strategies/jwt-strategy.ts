@@ -14,18 +14,11 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
             jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
             ignoreExpiration: false,
             secretOrKey: configService.getOrThrow('JWT_ACCESS_TOKEN_SECRET'),
-            passReqToCallback: true,
         })
     }
 
-    async validate(req: Request, payload: any) {
+    async validate(payload: any) {
         try {
-            const rawRefreshToken =
-                ExtractJwt.fromAuthHeaderAsBearerToken()(req)
-            if (!rawRefreshToken) {
-                throw new ForbiddenException('Authorization header missing')
-            }
-
             const user = await this.authService.validateUserWithId(payload.sub)
             if (!user || !user.refreshToken) {
                 throw new ForbiddenException('Access denied')

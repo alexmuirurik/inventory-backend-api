@@ -2,16 +2,22 @@ import { Injectable } from '@nestjs/common'
 import { PrismaService } from '../prisma/prisma.service'
 import { User } from 'generated/prisma'
 import z from 'zod'
-import { SignUpSchema, UserSignUpSchema } from 'src/common/schemas/auth.schema'
+import { UserSignUpSchema } from 'src/common/schemas/auth.schema'
 import { UserWithoutPassword } from 'src/common/interfaces/userInterfaces'
 
 @Injectable()
 export class UsersService {
     constructor(private prisma: PrismaService) {}
 
-    async create(data: z.infer<typeof UserSignUpSchema>): Promise<User> {
+    async create(data: z.infer<typeof UserSignUpSchema>) {
         try {
-            const user = await this.prisma.user.create({ data: data })
+            const user = await this.prisma.user.create({
+                data: data,
+                omit: {
+                    password: true,
+                    refreshToken: true,
+                },
+            })
             return Promise.resolve(user)
         } catch (error) {
             return Promise.reject(error)
@@ -22,6 +28,10 @@ export class UsersService {
         try {
             const users = await this.prisma.user.findMany({
                 where: criteria,
+                omit: {
+                    password: true,
+                    refreshToken: true,
+                },
             })
             return Promise.resolve(users)
         } catch (error) {
@@ -35,7 +45,9 @@ export class UsersService {
                 where: {
                     id: userId,
                 },
-                omit: { password: true },
+                omit: {
+                    password: true,
+                },
             })
 
             return Promise.resolve(user)
@@ -50,6 +62,9 @@ export class UsersService {
                 where: {
                     email: email,
                 },
+                omit: {
+                    refreshToken: true,
+                }
             })
 
             return Promise.resolve(user)
@@ -66,7 +81,10 @@ export class UsersService {
                     id: id,
                 },
                 data: userData,
-                omit: { password: true },
+                omit: {
+                    password: true,
+                    refreshToken: true,
+                },
             })
 
             return Promise.resolve(user)
@@ -82,7 +100,7 @@ export class UsersService {
                     id: userId,
                 },
             })
-            
+
             if (!deleted) {
                 return Promise.resolve({ message: 'User not found' })
             }

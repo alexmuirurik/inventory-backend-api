@@ -25,10 +25,10 @@ export class JwtRefreshStrategy extends PassportStrategy(
         })
     }
 
-    async validate(payload: any, req: Request) {
+    async validate(payload: any) {
         try {
             const user = await this.authService.validateUserWithId(payload.sub)
-            if (!user?.refreshToken) {
+            if (!user || !user.refreshToken) {
                 throw new ForbiddenException('Access denied')
             }
 

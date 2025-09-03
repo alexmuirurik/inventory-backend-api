@@ -8,7 +8,7 @@ import { SignUpSchema } from 'src/common/schemas/auth.schema'
 import { UserWithoutPassword } from 'src/common/interfaces/userInterfaces'
 import { COOKIE_OPTIONS, REFRESH_TOKEN_COOKIE } from 'src/common/constants'
 import { ConfigService } from '@nestjs/config'
-import { JWT_REFRESH_TOKEN_EXPIRY_TIME } from './auth.constants'
+import { JWT_ACCESS_TOKEN_EXPIRY_TIME, JWT_REFRESH_TOKEN_EXPIRY_TIME } from './auth.constants'
 
 @Injectable()
 export class AuthService {
@@ -44,48 +44,37 @@ export class AuthService {
         }
     }
 
-    async generateRefreshToken(
-        userId: string,
-        currentRefreshToken?: string,
-        currentRefreshTokenExpiresAt?: Date,
-    ) {
-        const newRefreshToken = this.jwtService.sign(
-            { sub: userId },
-            {
-                secret: this.configService.get('JWT_REFRESH_TOKEN_SECRET'),
-                expiresIn: JWT_REFRESH_TOKEN_EXPIRY_TIME,
-            },
-        )
-
-        if (currentRefreshToken && currentRefreshTokenExpiresAt) {
-            await this.usersService.update({
-                id: userId,
-                refreshToken: newRefreshToken,
-            })
-        }
+    generateRefreshToken(data: {
+        sub: string
+        email: string
+        role: string
+        time: string
+    }) {
+        const { time, ...newData } = data
+        const newRefreshToken = this.jwtService.sign(newData, {
+            secret: this.configService.getOrThrow('JWT_ACCESS_TOKEN_SECRET'),
+            expiresIn: time,
+        })
 
         return newRefreshToken
     }
 
-    async generateTokenPair(
-        user: UserWithoutPassword,
-        res: express.Response,
-        currentRefreshToken?: string,
-        currentRefreshTokenExpiresAt?: Date,
-    ) {
-        const payload = {
-            email: user.email,
+    async generateTokenPair(user: UserWithoutPassword, res: express.Response) {
+        const refreshToken = this.generateRefreshToken({
             sub: user.id,
+            email: user.email,
             role: user.role,
-        }
+            time: JWT_REFRESH_TOKEN_EXPIRY_TIME,
+        })
 
-        const refreshToken = await this.generateRefreshToken(
-            user.id,
-            currentRefreshToken,
-            currentRefreshTokenExpiresAt,
-        )
+        const accessToken = this.generateRefreshToken({
+            sub: user.id,
+            email: user.email,
+            role: user.role,
+            time: JWT_ACCESS_TOKEN_EXPIRY_TIME,
+        })
 
-        await this.usersService.update({
+        const newUser = await this.usersService.update({
             id: user.id,
             refreshToken,
         })
@@ -94,7 +83,10 @@ export class AuthService {
             ...COOKIE_OPTIONS,
         })
 
-        return { ...user, accessToken: this.jwtService.sign(payload) }
+        return {
+            ...newUser,
+            accessToken: accessToken,
+        }
     }
 
     async signUp(data: z.infer<typeof SignUpSchema>) {
@@ -116,7 +108,7 @@ export class AuthService {
 
     async login(user: UserWithoutPassword, res: express.Response) {
         try {
-            return await this.generateTokenPair(user, res)
+            return this.generateTokenPair(user, res)
         } catch (error) {
             return Promise.reject(error)
         }
@@ -134,10 +126,10 @@ export class AuthService {
         try {
             res.clearCookie(REFRESH_TOKEN_COOKIE)
             const loggedOut = await this.usersService.update({
-                ...user,
+                id: user.id,
                 refreshToken: null,
             })
-
+            
             return !!loggedOut
         } catch (error) {
             return Promise.reject(error)

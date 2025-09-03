@@ -19,6 +19,7 @@ enum PaymentMethod {
     CARD
     MOBILE_MONEY
     BANK_TRANSFER
+    SPLIT_PAYMENT
 }
 
 enum PaymentStatus {
@@ -39,17 +40,99 @@ enum PurchaseOrderStatus {
     CANCELLED
 }
 
+enum SessionStatus {
+    OPEN
+    CLOSED
+}
+
+enum SaleStatus {
+    PENDING
+    COMPLETED
+    CANCELLED
+}
+
 model User {
-    id           String   @id @default(auto()) @map("_id") @db.ObjectId
-    firstName    String
-    lastName     String
-    refreshToken String?
-    email        String   @unique
-    password     String
-    role         UserRole @default(CASHIER)
-    sales        Sale[]
-    createdAt    DateTime @default(now())
-    updatedAt    DateTime @updatedAt
+    id              String            @id @default(auto()) @map("_id") @db.ObjectId
+    firstName       String
+    lastName        String
+    refreshToken    String?
+    email           String            @unique
+    password        String
+    role            UserRole          @default(ADMIN)
+    sales           Sale[]
+    billings        Billing[]
+    createdAt       DateTime          @default(now())
+    updatedAt       DateTime          @updatedAt
+    CheckoutSession CheckoutSession[]
+}
+
+model Supplier {
+    id              String           @id @default(auto()) @map("_id") @db.ObjectId
+    name            String
+    phone           String?
+    email           String?
+    checkInSessions CheckinSession[]
+    products        Product[]
+    createdAt       DateTime         @default(now())
+    updatedAt       DateTime         @updatedAt
+    ProductCheckIn  ProductCheckIn[]
+}
+
+model CheckinSession {
+    id          String        @id @default(auto()) @map("_id") @db.ObjectId
+    supplierId  String?       @db.ObjectId
+    supplier    Supplier?     @relation(fields: [supplierId], references: [id])
+    locationId  String        @db.ObjectId
+    location    StoreLocation @relation(fields: [locationId], references: [id])
+    totalAmount Float
+    startedAt   DateTime      @default(now())
+    endedAt     DateTime?
+    status      SessionStatus @default(OPEN)
+}
+
+model Customer {
+    id            String   @id @default(auto()) @map("_id") @db.ObjectId
+    name          String
+    phone         String?  @unique
+    email         String?  @unique
+    loyaltyPoints Int      @default(0)
+    sales         Sale[]
+    createdAt     DateTime @default(now())
+    updatedAt     DateTime @updatedAt
+}
+
+model CheckoutSession {
+    id          String        @id @default(auto()) @map("_id") @db.ObjectId
+    cashierId   String        @db.ObjectId
+    cashier     User          @relation(fields: [cashierId], references: [id])
+    startedAt   DateTime      @default(now())
+    endedAt     DateTime?
+    openingCash Float 
+    closingCash Float? 
+    sales       Sale[]
+    status      SessionStatus @default(OPEN)
+}
+
+model StoreLocation {
+    id        String           @id @default(auto()) @map("_id") @db.ObjectId
+    name      String
+    address   String?
+    currency  String
+    taxRate   Float            @default(0)
+    stocks    Stock[]
+    sessions  CheckinSession[]
+    createdAt DateTime         @default(now())
+    updatedAt DateTime         @updatedAt
+}
+
+model Billing {
+    id        String   @id @default(auto()) @map("_id") @db.ObjectId
+    userId    String   @db.ObjectId
+    user      User     @relation(fields: [userId], references: [id])
+    amount    Float
+    status    String
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
 }
 
 model Product {
@@ -72,6 +155,8 @@ model Product {
     returns             Return[]
     createdAt           DateTime             @default(now())
     updatedAt           DateTime             @updatedAt
+    Supplier            Supplier?            @relation(fields: [supplierId], references: [id])
+    supplierId          String?              @db.ObjectId
 }
 
 model ProductCategory {
@@ -119,20 +204,23 @@ model ProductCheckinItem {
 }
 
 model Sale {
-    id            String        @id @default(auto()) @map("_id") @db.ObjectId
-    customerId    String?       @db.ObjectId
-    customer      Customer?     @relation(fields: [customerId], references: [id])
-    userId        String        @db.ObjectId
-    user          User          @relation(fields: [userId], references: [id])
-    saleDate      DateTime      @default(now())
-    totalAmount   Float
-    paymentStatus PaymentStatus @default(PAID)
-    paymentMethod PaymentMethod
-    saleItems     SaleItem[]
-    payments      Payment[]
-    returns       Return[]
-    createdAt     DateTime      @default(now())
-    updatedAt     DateTime      @updatedAt
+    id                String           @id @default(auto()) @map("_id") @db.ObjectId
+    customerId        String?          @db.ObjectId
+    customer          Customer?        @relation(fields: [customerId], references: [id])
+    userId            String           @db.ObjectId
+    user              User             @relation(fields: [userId], references: [id])
+    saleDate          DateTime         @default(now())
+    totalAmount       Float
+    paymentStatus     PaymentStatus    @default(PAID)
+    paymentMethod     PaymentMethod
+    saleItems         SaleItem[]
+    payments          Payment[]
+    returns           Return[]
+    status            SaleStatus       @default(PENDING)
+    createdAt         DateTime         @default(now())
+    updatedAt         DateTime         @updatedAt
+    CheckoutSession   CheckoutSession? @relation(fields: [checkoutSessionId], references: [id])
+    checkoutSessionId String?          @db.ObjectId
 }
 
 model SaleItem {
@@ -172,35 +260,4 @@ model Return {
     returnDate DateTime @default(now())
     createdAt  DateTime @default(now())
     updatedAt  DateTime @updatedAt
-}
-
-model Supplier {
-    id              String           @id @default(auto()) @map("_id") @db.ObjectId
-    name            String
-    contactInfo     String?
-    address         String?
-    taxId           String?
-    productCheckIns ProductCheckIn[]
-    createdAt       DateTime         @default(now())
-    updatedAt       DateTime         @updatedAt
-}
-
-model Customer {
-    id            String   @id @default(auto()) @map("_id") @db.ObjectId
-    name          String
-    phone         String?  @unique
-    email         String?  @unique
-    loyaltyPoints Int      @default(0)
-    sales         Sale[]
-    createdAt     DateTime @default(now())
-    updatedAt     DateTime @updatedAt
-}
-
-model StoreLocation {
-    id        String   @id @default(auto()) @map("_id") @db.ObjectId
-    name      String
-    address   String?
-    stocks    Stock[]
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
 }

@@ -15,7 +15,7 @@ export const SignUpSchema = z
         address: z.string().min(10).max(200),
         businessName: z.string().min(2).max(100),
         currency: z.string().min(3).max(3),
-        taxRate: z.number().min(0).max(100),
+        taxRate: z.coerce.number().min(0).max(100),
         phoneNumber: z.string().min(10).max(15),
     })
     .superRefine((data, ctx) => {

@@ -19,7 +19,7 @@ import { RolesGuard } from './guards/role.guard'
             isGlobal: true,
         }),
         UsersModule,
-        PassportModule,
+        PassportModule.register({ defaultStrategy: 'jwt' }),
         JwtModule.registerAsync({
             global: true,
             imports: [ConfigModule],
@@ -42,12 +42,12 @@ import { RolesGuard } from './guards/role.guard'
         JwtRefreshStrategy,
         {
             provide: APP_GUARD,
-            useClass: RolesGuard,
+            useClass: JwtAuthGuard,
         },
         {
             provide: APP_GUARD,
-            useClass: JwtAuthGuard,
-        },
+            useClass: RolesGuard
+        }
     ],
     exports: [AuthService],
 })

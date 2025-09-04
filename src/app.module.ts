@@ -12,6 +12,7 @@ import { CategoriesModule } from './modules/categories/categories.module'
 import { SalesModule } from './modules/sales/sales.module'
 import { CheckoutsModule } from './modules/checkouts/checkouts.module'
 import { ReportsModule } from './modules/reports/reports.module'
+import { BusinessModule } from './modules/business/business.module'
 
 @Module({
     imports: [
@@ -23,6 +24,7 @@ import { ReportsModule } from './modules/reports/reports.module'
         SalesModule,
         CheckoutsModule,
         ReportsModule,
+        BusinessModule,
     ],
     controllers: [AuthController, UsersController],
     providers: [UsersService, AuthService, PrismaService],

@@ -1,8 +1,4 @@
-import {
-    Injectable,
-    ExecutionContext,
-    UnauthorizedException,
-} from '@nestjs/common'
+import { Injectable, ExecutionContext, UnauthorizedException } from '@nestjs/common'
 import { Reflector } from '@nestjs/core'
 import { AuthGuard } from '@nestjs/passport'
 import { IS_PUBLIC_KEY } from 'src/common/constants'
@@ -22,16 +18,15 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
         if (isPublic) {
             return true
         }
-
+        
         return super.canActivate(context)
     }
 
     handleRequest(err: any, user: any, info: any) {
-        console.log({ err, user, info })
         if (err || !user) {
-            throw err || new UnauthorizedException()
+            throw err || new UnauthorizedException();
         }
-
-        return user
+        
+        return user;
     }
 }

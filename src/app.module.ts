@@ -10,9 +10,8 @@ import { PrismaService } from './modules/prisma/prisma.service'
 import { ProductsModule } from './modules/products/products.module'
 import { CategoriesModule } from './modules/categories/categories.module'
 import { SalesModule } from './modules/sales/sales.module'
-import { CheckoutSessionsModule } from './modules/checkout-sessions/checkout-sessions.module';
-import { CheckinSessionsModule } from './modules/checkin-sessions/checkin-sessions.module';
-import { ReportsModule } from './modules/reports/reports.module';
+import { CheckoutSessionsModule } from './modules/checkout-sessions/checkout-sessions.module'
+import { ReportsModule } from './modules/reports/reports.module'
 
 @Module({
     imports: [
@@ -23,7 +22,6 @@ import { ReportsModule } from './modules/reports/reports.module';
         CategoriesModule,
         SalesModule,
         CheckoutSessionsModule,
-        CheckinSessionsModule,
         ReportsModule,
     ],
     controllers: [AuthController, UsersController],

@@ -64,31 +64,19 @@ model User {
     createdAt       DateTime          @default(now())
     updatedAt       DateTime          @updatedAt
     CheckoutSession CheckoutSession[]
-}
-
-model Supplier {
-    id              String           @id @default(auto()) @map("_id") @db.ObjectId
-    name            String
-    phone           String?
-    email           String?
-    checkInSessions CheckinSession[]
-    products        Product[]
-    createdAt       DateTime         @default(now())
-    updatedAt       DateTime         @updatedAt
     ProductCheckIn  ProductCheckIn[]
 }
 
-model CheckinSession {
-    id             String           @id @default(auto()) @map("_id") @db.ObjectId
-    supplierId     String?          @db.ObjectId
-    supplier       Supplier?        @relation(fields: [supplierId], references: [id])
-    locationId     String           @db.ObjectId
-    location       StoreLocation    @relation(fields: [locationId], references: [id])
-    totalAmount    Float
-    status         SessionStatus    @default(OPEN)
-    ProductCheckIn ProductCheckIn[]
-    startedAt      DateTime         @default(now())
-    endedAt        DateTime?
+model Supplier {
+    id                 String               @id @default(auto()) @map("_id") @db.ObjectId
+    name               String
+    phone              String?
+    email              String?
+    products           Product[]
+    createdAt          DateTime             @default(now())
+    updatedAt          DateTime             @updatedAt
+    ProductCheckIn     ProductCheckIn[]
+    ProductCheckinItem ProductCheckinItem[]
 }
 
 model Customer {
@@ -115,15 +103,15 @@ model CheckoutSession {
 }
 
 model StoreLocation {
-    id        String           @id @default(auto()) @map("_id") @db.ObjectId
-    name      String
-    address   String?
-    currency  String
-    taxRate   Float            @default(0)
-    stocks    Stock[]
-    sessions  CheckinSession[]
-    createdAt DateTime         @default(now())
-    updatedAt DateTime         @updatedAt
+    id              String           @id @default(auto()) @map("_id") @db.ObjectId
+    name            String
+    address         String?
+    currency        String
+    taxRate         Float            @default(0)
+    stocks          Stock[]
+    productCheckins ProductCheckIn[]
+    createdAt       DateTime         @default(now())
+    updatedAt       DateTime         @updatedAt
 }
 
 model Billing {
@@ -141,8 +129,8 @@ model Product {
     name                String
     sku                 String               @unique
     barcode             String?              @unique
-    categoryId          String?               @db.ObjectId
-    category            ProductCategory?      @relation(fields: [categoryId], references: [id])
+    categoryId          String?              @db.ObjectId
+    category            ProductCategory?     @relation(fields: [categoryId], references: [id])
     unit                String
     costPrice           Float
     sellingPrice        Float
@@ -161,12 +149,12 @@ model Product {
 }
 
 model ProductImage {
-    id          String   @id @default(auto()) @map("_id") @db.ObjectId
-    productId   String   @db.ObjectId
-    product     Product  @relation(fields: [productId], references: [id])
-    imageUrl    String
-    createdAt   DateTime @default(now())
-    updatedAt   DateTime @updatedAt
+    id        String   @id @default(auto()) @map("_id") @db.ObjectId
+    productId String   @db.ObjectId
+    product   Product  @relation(fields: [productId], references: [id])
+    imageUrl  String
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
 }
 
 model ProductCategory {
@@ -190,23 +178,26 @@ model Stock {
 }
 
 model ProductCheckIn {
-    id               String               @id @default(auto()) @map("_id") @db.ObjectId
-    checkinSessionId String?              @db.ObjectId
-    checkinSession   CheckinSession?      @relation(fields: [checkinSessionId], references: [id])
-    supplierId       String?              @db.ObjectId
-    supplier         Supplier?            @relation(fields: [supplierId], references: [id])
-    orderDate        DateTime             @default(now())
-    status           PurchaseOrderStatus  @default(PENDING)
-    totalCost        Float
-    items            ProductCheckinItem[]
-    createdAt        DateTime             @default(now())
-    updatedAt        DateTime             @updatedAt
+    id         String               @id @default(auto()) @map("_id") @db.ObjectId
+    locationId String               @db.ObjectId
+    location   StoreLocation        @relation(fields: [locationId], references: [id])
+    userId     String               @db.ObjectId
+    user       User                 @relation(fields: [userId], references: [id])
+    totalSpent Float                @default(0)
+    items      ProductCheckinItem[]
+    status     PurchaseOrderStatus  @default(PENDING)
+    createdAt  DateTime             @default(now())
+    updatedAt  DateTime             @updatedAt
+    Supplier   Supplier?            @relation(fields: [supplierId], references: [id])
+    supplierId String?              @db.ObjectId
 }
 
 model ProductCheckinItem {
     id               String         @id @default(auto()) @map("_id") @db.ObjectId
     productCheckinId String         @db.ObjectId
     productCheckin   ProductCheckIn @relation(fields: [productCheckinId], references: [id])
+    supplierId       String?        @db.ObjectId
+    supplier         Supplier?      @relation(fields: [supplierId], references: [id])
     productId        String         @db.ObjectId
     product          Product        @relation(fields: [productId], references: [id])
     quantity         Int

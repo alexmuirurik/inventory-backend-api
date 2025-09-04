@@ -28,6 +28,18 @@ export class ProductsController {
         return this.productsService.create(createProductDto)
     }
 
+    @Post('bulk')
+    @UsePipes(new ZodValidationPipe(z.array(ProductSchema)))
+    createBulk(@Body() createProductDtos: z.infer<typeof ProductSchema>[]) {
+        return this.productsService.createBulk(createProductDtos)
+    }
+
+    @Get('/stock-history/:id')
+    @UsePipes(new ZodValidationPipe(IdSchema))
+    findStockHistory(@Param('id') id: string) {
+        return this.productsService.findStockHistory(id)
+    }
+
     @Get(':id')
     @UsePipes(new ZodValidationPipe(IdSchema))
     findOne(@Param('id') id: string) {

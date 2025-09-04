@@ -1,20 +1,27 @@
 import { Injectable } from '@nestjs/common'
 import { PrismaService } from '../prisma/prisma.service'
 import z from 'zod'
-import { StockSchema } from 'src/common/schemas/stock.schema'
+import {
+    ProductCheckInSchema,
+    StockSchema,
+} from 'src/common/schemas/stock.schema'
 
 @Injectable()
 export class StockService {
     constructor(private prisma: PrismaService) {}
 
+    async create(data: z.infer<typeof ProductCheckInSchema>) {
+        return this.prisma.productCheckIn.create({
+            data,
+        })
+    }
+
     async findAll() {
         return this.prisma.stock.findMany()
     }
 
-    async create(data: z.infer<typeof StockSchema>) {
-        return this.prisma.stock.create({
-            data,
-        })
+    async findByStatus(status: string) {
+        return this.prisma.productCheckIn.findMany()
     }
 
     async findOne(id: string) {
@@ -31,6 +38,17 @@ export class StockService {
                 id: data.id,
             },
             data,
+        })
+    }
+
+    async closeSession(id: string) {
+        return this.prisma.productCheckIn.update({
+            where: {
+                id,
+            },
+            data: {
+                status: 'RECEIVED'
+            }
         })
     }
 

@@ -18,6 +18,17 @@ export class ProductsService {
         }
     }
 
+    async createBulk(createProducts: z.infer<typeof ProductSchema>[]) {
+        try {
+            const createdProducts = await this.prisma.product.createMany({
+                data: createProducts,
+            })
+            return createdProducts
+        } catch (error) {
+            return Promise.reject(error)
+        }
+    }
+
     async findAll() {
         try {
             const products = await this.prisma.product.findMany()
@@ -33,6 +44,17 @@ export class ProductsService {
                 where: { id },
             })
             return product
+        } catch (error) {
+            return Promise.reject(error)
+        }
+    }
+
+    async findStockHistory(id: string) {
+        try {
+            const stockHistory = await this.prisma.productCheckinItem.findMany({
+                where: { productId: id },
+            })
+            return stockHistory
         } catch (error) {
             return Promise.reject(error)
         }

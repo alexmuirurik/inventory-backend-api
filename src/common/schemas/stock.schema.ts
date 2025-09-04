@@ -15,7 +15,6 @@ export const ProductCheckinItemSchema = z.object({
 })
 
 export const ProductCheckInSchema = z.object({
-    supplierId: z.string().max(100),
-    status: z.enum(['PENDING', 'RECEIVED', 'CANCELLED']),
-    totalCost: z.coerce.number().min(0),
+    userId: z.string().max(100),
+    locationId: z.string().max(100),
 })

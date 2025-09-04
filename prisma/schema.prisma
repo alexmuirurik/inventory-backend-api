@@ -61,10 +61,35 @@ model User {
     role            UserRole          @default(ADMIN)
     sales           Sale[]
     billings        Billing[]
+    business        Business[]
     createdAt       DateTime          @default(now())
     updatedAt       DateTime          @updatedAt
     CheckoutSession CheckoutSession[]
     ProductCheckIn  ProductCheckIn[]
+}
+
+model Business {
+    id            String          @id @default(auto()) @map("_id") @db.ObjectId
+    name          String
+    userId        String          @db.ObjectId
+    user          User            @relation(fields: [userId], references: [id])
+    StoreLocation StoreLocation[]
+    createdAt     DateTime        @default(now())
+    updatedAt     DateTime        @updatedAt
+}
+
+model StoreLocation {
+    id              String           @id @default(auto()) @map("_id") @db.ObjectId
+    businessId      String           @db.ObjectId
+    business        Business         @relation(fields: [businessId], references: [id])
+    address         String
+    currency        String
+    taxRate         Float            @default(0)
+    phone           String
+    stocks          Stock[]
+    productCheckins ProductCheckIn[]
+    createdAt       DateTime         @default(now())
+    updatedAt       DateTime         @updatedAt
 }
 
 model Supplier {
@@ -100,19 +125,6 @@ model CheckoutSession {
     status      SessionStatus @default(OPEN)
     startedAt   DateTime      @default(now())
     endedAt     DateTime?
-}
-
-model StoreLocation {
-    id              String           @id @default(auto()) @map("_id") @db.ObjectId
-    name            String
-    address         String?
-    currency        String
-    taxRate         Float            @default(0)
-    phone           String?
-    stocks          Stock[]
-    productCheckins ProductCheckIn[]
-    createdAt       DateTime         @default(now())
-    updatedAt       DateTime         @updatedAt
 }
 
 model Billing {

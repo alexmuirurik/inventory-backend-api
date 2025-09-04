@@ -10,7 +10,7 @@ import { PrismaService } from './modules/prisma/prisma.service'
 import { ProductsModule } from './modules/products/products.module'
 import { CategoriesModule } from './modules/categories/categories.module'
 import { SalesModule } from './modules/sales/sales.module'
-import { CheckoutSessionsModule } from './modules/checkout-sessions/checkout-sessions.module'
+import { CheckoutsModule } from './modules/checkouts/checkouts.module'
 import { ReportsModule } from './modules/reports/reports.module'
 
 @Module({
@@ -21,7 +21,7 @@ import { ReportsModule } from './modules/reports/reports.module'
         ProductsModule,
         CategoriesModule,
         SalesModule,
-        CheckoutSessionsModule,
+        CheckoutsModule,
         ReportsModule,
     ],
     controllers: [AuthController, UsersController],

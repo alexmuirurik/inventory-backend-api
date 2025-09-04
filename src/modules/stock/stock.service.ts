@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common'
 import { PrismaService } from '../prisma/prisma.service'
 import z from 'zod'
 import {
+    ProductCheckinItemSchema,
     ProductCheckInSchema,
     StockSchema,
 } from 'src/common/schemas/stock.schema'
@@ -15,6 +16,7 @@ export class StockService {
             data,
         })
     }
+
 
     async findAll() {
         return this.prisma.stock.findMany()

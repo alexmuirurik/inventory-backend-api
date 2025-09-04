@@ -11,13 +11,40 @@ export class UsersService {
 
     async create(data: z.infer<typeof UserSignUpSchema>) {
         try {
+            const {
+                businessName,
+                address,
+                currency,
+                taxRate,
+                phoneNumber,
+                ...userData
+            } = data
+
             const user = await this.prisma.user.create({
-                data: data,
+                data: userData,
                 omit: {
                     password: true,
                     refreshToken: true,
                 },
             })
+
+            const business = await this.prisma.business.create({
+                data: {
+                    userId: user.id,
+                    name: businessName,
+                },
+            })
+
+            const storeLocation = await this.prisma.storeLocation.create({
+                data: {
+                    address,
+                    currency,
+                    taxRate,
+                    phone: phoneNumber,
+                    businessId: business.id,
+                },
+            })
+
             return Promise.resolve(user)
         } catch (error) {
             return Promise.reject(error)
@@ -64,7 +91,7 @@ export class UsersService {
                 },
                 omit: {
                     refreshToken: true,
-                }
+                },
             })
 
             return Promise.resolve(user)

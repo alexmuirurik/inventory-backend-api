@@ -9,8 +9,10 @@ import { AuthService } from './modules/auth/auth.service'
 import { PrismaService } from './modules/prisma/prisma.service'
 import { ProductsModule } from './modules/products/products.module'
 import { CategoriesModule } from './modules/categories/categories.module'
-import { PurchasesModule } from './modules/purchases/purchases.module'
 import { SalesModule } from './modules/sales/sales.module'
+import { CheckoutSessionsModule } from './modules/checkout-sessions/checkout-sessions.module';
+import { CheckinSessionsModule } from './modules/checkin-sessions/checkin-sessions.module';
+import { ReportsModule } from './modules/reports/reports.module';
 
 @Module({
     imports: [
@@ -19,8 +21,10 @@ import { SalesModule } from './modules/sales/sales.module'
         UsersModule,
         ProductsModule,
         CategoriesModule,
-        PurchasesModule,
         SalesModule,
+        CheckoutSessionsModule,
+        CheckinSessionsModule,
+        ReportsModule,
     ],
     controllers: [AuthController, UsersController],
     providers: [UsersService, AuthService, PrismaService],

@@ -6,40 +6,47 @@ import {
     Patch,
     Param,
     Delete,
+    UsePipes,
 } from '@nestjs/common'
 import { CategoriesService } from './categories.service'
 import z from 'zod'
 import { CategorySchema } from 'src/common/schemas/category.schema'
+import { ZodValidationPipe } from 'src/common/validators/zodValidator'
+import { IdSchema } from 'src/common/schemas/product.schemas'
 
 @Controller('categories')
 export class CategoriesController {
     constructor(private readonly categoriesService: CategoriesService) {}
 
     @Post()
-    create(@Body() createCategoryDto: z.infer<typeof CategorySchema>) {
-        return this.categoriesService.create(createCategoryDto)
+    @UsePipes(new ZodValidationPipe(CategorySchema))
+    async create(@Body() createCategory: z.infer<typeof CategorySchema>) {
+        return this.categoriesService.create(createCategory)
     }
 
     @Get()
-    findAll() {
-        return this.categoriesService.findAll()
+    async findAll() {
+        return await this.categoriesService.findAll()
     }
 
     @Get(':id')
-    findOne(@Param('id') id: string) {
-        return this.categoriesService.findOne(+id)
+    @UsePipes(new ZodValidationPipe(IdSchema))
+    async findOne(@Param('id') id: string) {
+        return await this.categoriesService.findOne(id)
     }
 
     @Patch(':id')
-    update(
+    @UsePipes(new ZodValidationPipe(IdSchema))
+    async update(
         @Param('id') id: string,
-        @Body() updateCategoryDto: z.infer<typeof CategorySchema>,
+        @Body() updateCategory: z.infer<typeof CategorySchema>,
     ) {
-        return this.categoriesService.update(+id, updateCategoryDto)
+        return await this.categoriesService.update(updateCategory)
     }
 
     @Delete(':id')
-    remove(@Param('id') id: string) {
-        return this.categoriesService.remove(+id)
+    @UsePipes(new ZodValidationPipe(IdSchema))
+    async remove(@Param('id') id: string) {
+        return await this.categoriesService.remove(id)
     }
 }

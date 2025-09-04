@@ -6,6 +6,7 @@ export const IdSchema = z.object({
 
 export const ProductSchema = z.object({
     name: z.string().min(2).max(100),
+    locationId: z.string(),
     categoryId: z.string().max(100),
     unit: z.string().max(50),
     costPrice: z.coerce.number().min(0),

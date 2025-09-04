@@ -29,11 +29,6 @@ export class StockController {
         return this.stockService.findByStatus(data.status)
     }
 
-    @Post()
-    @UsePipes(new ZodValidationPipe(ProductCheckInSchema))
-    async create(@Body() data: z.infer<typeof ProductCheckInSchema>) {
-        return this.stockService.create(data)
-    }
 
     @Post('close/:id')
     async closeSession(@Param('id') id: string) {

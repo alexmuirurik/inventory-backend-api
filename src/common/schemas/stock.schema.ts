@@ -8,7 +8,7 @@ export const StockSchema = z.object({
 })
 
 export const ProductCheckinItemSchema = z.object({
-    productCheckInId: z.string().max(100),
+    productCheckinId: z.string().max(100),
     productId: z.string().max(100),
     quantity: z.coerce.number().min(0),
     costPrice: z.coerce.number().min(0),

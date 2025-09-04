@@ -199,10 +199,10 @@ model ProductCheckIn {
     totalSpent Float                @default(0)
     items      ProductCheckinItem[]
     status     PurchaseOrderStatus  @default(PENDING)
-    createdAt  DateTime             @default(now())
-    updatedAt  DateTime             @updatedAt
     Supplier   Supplier?            @relation(fields: [supplierId], references: [id])
     supplierId String?              @db.ObjectId
+    createdAt  DateTime             @default(now())
+    updatedAt  DateTime             @updatedAt
 }
 
 model ProductCheckinItem {

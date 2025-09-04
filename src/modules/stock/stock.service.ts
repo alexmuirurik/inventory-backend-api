@@ -11,12 +11,23 @@ import {
 export class StockService {
     constructor(private prisma: PrismaService) {}
 
-    async create(data: z.infer<typeof ProductCheckInSchema>) {
+    async createSession(data: z.infer<typeof ProductCheckInSchema>) {
         return this.prisma.productCheckIn.create({
             data,
         })
     }
 
+    async create(data: z.infer<typeof ProductCheckinItemSchema>) {
+        try {
+            const addProduct = await this.prisma.productCheckinItem.create({
+                data,
+            })
+
+            return addProduct
+        } catch (error) {
+            return Promise.reject(error)
+        }
+    }
 
     async findAll() {
         return this.prisma.stock.findMany()
@@ -49,8 +60,8 @@ export class StockService {
                 id,
             },
             data: {
-                status: 'RECEIVED'
-            }
+                status: 'RECEIVED',
+            },
         })
     }
 

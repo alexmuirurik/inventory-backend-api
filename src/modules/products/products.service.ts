@@ -2,13 +2,26 @@ import { Injectable } from '@nestjs/common'
 import { ProductSchema } from 'src/common/schemas/product.schemas'
 import z from 'zod'
 import { PrismaService } from '../prisma/prisma.service'
+import { StockService } from '../stock/stock.service'
+import { UserWithoutPassword } from 'src/common/interfaces/userInterfaces'
 
 @Injectable()
 export class ProductsService {
-    constructor(private prisma: PrismaService) {}
+    constructor(
+        private prisma: PrismaService,
+        private stockService: StockService,
+    ) {}
 
-    async create(createProduct: z.infer<typeof ProductSchema>) {
+    async create(
+        createProduct: z.infer<typeof ProductSchema>,
+        user: UserWithoutPassword,
+    ) {
         try {
+            //check if the user has an active productCheckinSession
+            const productCheckIn = this.stockService.createSession({
+                userId: user.id,
+                locationId: createProduct.locationId
+            })
             const createdProduct = await this.prisma.product.create({
                 data: createProduct,
             })

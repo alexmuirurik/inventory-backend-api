@@ -108,6 +108,7 @@ model StoreLocation {
     address         String?
     currency        String
     taxRate         Float            @default(0)
+    phone           String?
     stocks          Stock[]
     productCheckins ProductCheckIn[]
     createdAt       DateTime         @default(now())

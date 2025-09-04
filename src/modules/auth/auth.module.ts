@@ -11,6 +11,7 @@ import { JwtAuthGuard } from './guards/jwt-auth.guard'
 import { JwtStrategy } from './strategies/jwt-strategy'
 import { LocalStrategy } from './strategies/local-strategy'
 import { JwtRefreshStrategy } from './strategies/jwt-refresh-strategy'
+import { RolesGuard } from './guards/role.guard'
 
 @Module({
     imports: [
@@ -39,6 +40,10 @@ import { JwtRefreshStrategy } from './strategies/jwt-refresh-strategy'
         JwtStrategy,
         LocalStrategy,
         JwtRefreshStrategy,
+        {
+            provide: APP_GUARD,
+            useClass: RolesGuard,
+        },
         {
             provide: APP_GUARD,
             useClass: JwtAuthGuard,

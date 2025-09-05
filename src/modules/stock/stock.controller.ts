@@ -24,12 +24,6 @@ export class StockController {
         return this.stockService.findAll()
     }
 
-    @Post('filter')
-    async filter(@Body() data: { status: string }) {
-        return this.stockService.findByStatus(data.status)
-    }
-
-
     @Post('close/:id')
     async closeSession(@Param('id') id: string) {
         return this.stockService.closeSession(id)

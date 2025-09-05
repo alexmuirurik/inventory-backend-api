@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common'
+import { ConflictException, Injectable } from '@nestjs/common'
 import { ProductSchema } from 'src/common/schemas/product.schemas'
 import z from 'zod'
 import { PrismaService } from '../prisma/prisma.service'
@@ -17,14 +17,46 @@ export class ProductsService {
         user: UserWithoutPassword,
     ) {
         try {
-            //check if the user has an active productCheckinSession
-            const productCheckIn = this.stockService.createSession({
-                userId: user.id,
-                locationId: createProduct.locationId
+            const { locationId, quantity, ...otherProduct } = createProduct
+            const product = await this.prisma.product.findFirst({
+                where: {
+                    name: otherProduct.name,
+                }
             })
+
+            if(product) {
+                throw new ConflictException('Product already exists')
+            }
+
+            let productCheckIn =
+                await this.stockService.findCheckinByStatus('PENDING')
+
+            if (!productCheckIn) {
+                productCheckIn = await this.stockService.createCheckin({
+                    userId: user.id,
+                    locationId: createProduct.locationId,
+                })
+            }
+
             const createdProduct = await this.prisma.product.create({
-                data: createProduct,
+                data: otherProduct,
             })
+
+            const checkinItem = await this.stockService.createCheckinItem({
+                productCheckinId: productCheckIn.id,
+                productId: createdProduct.id,
+                quantity: createProduct.quantity,
+                costPrice: createProduct.costPrice,
+            })
+
+            const createStock = await this.prisma.stock.create({
+                data: {
+                    locationId: createProduct.locationId,
+                    quantity: createProduct.quantity,
+                    productId: createdProduct.id,
+                },
+            })
+
             return createdProduct
         } catch (error) {
             return Promise.reject(error)

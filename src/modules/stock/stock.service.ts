@@ -11,9 +11,15 @@ import {
 export class StockService {
     constructor(private prisma: PrismaService) {}
 
-    async createSession(data: z.infer<typeof ProductCheckInSchema>) {
+    async createCheckin(data: z.infer<typeof ProductCheckInSchema>) {
         return this.prisma.productCheckIn.create({
             data,
+        })
+    }
+
+    async createCheckinItem (data: z.infer<typeof ProductCheckinItemSchema>){
+        return this.prisma.productCheckinItem.create({
+            data
         })
     }
 
@@ -33,8 +39,13 @@ export class StockService {
         return this.prisma.stock.findMany()
     }
 
-    async findByStatus(status: string) {
-        return this.prisma.productCheckIn.findMany()
+
+    async findCheckinByStatus(status: 'PENDING' | 'RECEIVED' | 'CANCELLED') {
+        return this.prisma.productCheckIn.findFirst({
+            where: {
+                status
+            }
+        })
     }
 
     async findOne(id: string) {
